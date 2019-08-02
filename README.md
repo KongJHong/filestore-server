@@ -1,4 +1,4 @@
-# GO实战仿百度晕盘
+# GO实战仿百度云盘
 
 项目来自慕课网课程：GO实战仿百度云盘
 
@@ -26,3 +26,16 @@ http.HandleFunc("/file/delete", handler.FileDeleteHandler)
 
 ```
 
+## 服务架构变迁
+![](https://kongjhong-image.oss-cn-beijing.aliyuncs.com/img/{507E0415-6D1E-C59C-EA71-57DB581B41DD}.jpg)
+
+
+### 部署MySQL主从模式
+
+![](https://kongjhong-image.oss-cn-beijing.aliyuncs.com/img/{330FF055-031D-3284-7E2D-A859739E4E17}.jpg)
+
+单点模式发送故障时对整个系统的影响很大，因此主从模式是相当优秀的解决方案
+
+**表字段说明**
+
+![](https://kongjhong-image.oss-cn-beijing.aliyuncs.com/img/{948868D9-1C0C-AC58-0B87-D050CB2B0F5E}.jpg)

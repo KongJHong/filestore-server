@@ -4,7 +4,7 @@
  * @Author: KongJHong
  * @Date: 2019-08-02 10:27:28
  * @LastEditors: KongJHong
- * @LastEditTime: 2019-08-02 15:05:37
+ * @LastEditTime: 2019-08-02 20:22:49
  */
 
 
@@ -12,6 +12,7 @@ package meta
 
 import (
 	"sort"
+	mydb "filestore-server/db"
 )
 
 
@@ -31,9 +32,17 @@ func init(){
 	fileMetas = make(map[string]FileMeta)
 }
 
-//UpdateFileMeta:新增/更新文件元信息
+//UpdateFileMeta:新增/更新文件元信息 （弃用）
 func UpdateFileMeta(fmeta FileMeta){
 	fileMetas[fmeta.FileSha1] = fmeta
+}
+
+// 8-2_ 20:18
+//UpdateFileMetaDB:新增/更新文件信息到mysql中
+//替换原来的UpdateFileMeta函数
+func UpdateFileMetaDB(fmeta FileMeta) bool{
+	return mydb.OnFileUploadFinish(
+		fmeta.FileSha1, fmeta.FileName, fmeta.FileSize, fmeta.Location)
 }
 
 //GetFileMeta: 通过sha1获取文件的元信息对象

@@ -4,7 +4,7 @@
  * @Author: KongJHong
  * @Date: 2019-08-02 09:39:03
  * @LastEditors: KongJHong
- * @LastEditTime: 2019-08-02 15:07:33
+ * @LastEditTime: 2019-08-02 20:22:25
  */
 
 package handler
@@ -76,9 +76,9 @@ func UploadHandler(w http.ResponseWriter,r *http.Request){
 		//5. 修改文件读取下标，返回文件的sha1 hash值，添加到文件元信息对应管理结构
 		newFile.Seek(0,0)
 		fileMeta.FileSha1 = util.FileSha1(newFile)
-		meta.UpdateFileMeta(fileMeta)
-
-
+		
+		//meta.UpdateFileMeta(fileMeta)
+		meta.UpdateFileMetaDB(fileMeta)
 		http.Redirect(w, r, "/file/upload/suc", http.StatusFound)
 	}
 }
