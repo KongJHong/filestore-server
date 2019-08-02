@@ -4,7 +4,7 @@
  * @Author: KongJHong
  * @Date: 2019-08-02 09:39:03
  * @LastEditors: KongJHong
- * @LastEditTime: 2019-08-02 11:33:51
+ * @LastEditTime: 2019-08-02 15:07:33
  */
 
 package handler
@@ -19,6 +19,7 @@ import (
 	"filestore-server/meta"	//文件元信息
 	"filestore-server/util"
 	"encoding/json"
+	"strconv"
 )
 
 /*
@@ -90,7 +91,8 @@ func UploadSucHandler(w http.ResponseWriter, r *http.Request){
 
 //GetFileMetaHandler:查询文件元信息
 func GetFileMetaHandler(w http.ResponseWriter, r *http.Request){
-	r.ParseForm()
+	
+	r.ParseForm()//解析请求参数 如a=?&b=?这类，解析完成后放入Form字典等待取出
 
 	filehash := r.Form["filehash"][0]
 	fMeta := meta.GetFileMeta(filehash)
@@ -101,4 +103,98 @@ func GetFileMetaHandler(w http.ResponseWriter, r *http.Request){
 	}
 
 	w.Write(data)
+}
+
+//FileQueryHandler: 查询批量的文件元信息
+func FileQueryHandler(w http.ResponseWriter,r *http.Request){
+	
+	r.ParseForm()
+
+	limitCnt,_ := strconv.Atoi(r.Form.Get("limit")) //这个limit一定是url传参
+	fileMetas := meta.GetLastFileMetas(limitCnt)
+	data,err := json.Marshal(fileMetas)
+	if err != nil{
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(data)
+}
+
+//DownloadHandler:实现文件下载接口
+func DownloadHandler(w http.ResponseWriter, r *http.Request){
+	
+	r.ParseForm()
+	
+	fsha1 := r.Form.Get("filehash")
+	fileMeta := meta.GetFileMeta(fsha1)
+
+	file,err := os.Open(fileMeta.Location)
+	if err != nil{
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	data,err := ioutil.ReadAll(file)
+
+	if err != nil{
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	//设置http提示头部，申明为下载
+	w.Header().Set("Content-Type","application/octect-stream")		
+	w.Header().Set("Content-Disposition", "attachment;filename="+fileMeta.FileName+"\"")
+	w.Write(data)
+}
+
+//FileMetaUpdateHandler: 更新元信息接口（重命名） 
+//客户端带3个参数 一：0表示重命名 1表示其他的一些更行操作
+//二：文件唯一标志：hash值
+//三：更新后的文件名
+func FileMetaUpdateHandler(w http.ResponseWriter,r *http.Request){
+
+	r.ParseForm()
+
+	//客户端带3个参数
+	opType := r.Form.Get("op")
+	fileSha1 := r.Form.Get("filehash")
+	newFileName := r.Form.Get("filename")
+
+	if opType != "0"{
+		w.WriteHeader(http.StatusForbidden)  //返回403
+		return
+	}
+
+	if r.Method != "POST"{
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return 
+	}
+
+	curFileMeta := meta.GetFileMeta(fileSha1)
+	curFileMeta.FileName = newFileName
+	meta.UpdateFileMeta(curFileMeta)
+
+	
+	data,err := json.Marshal(curFileMeta)
+	if err != nil{
+		w.WriteHeader(http.StatusInternalServerError)
+		return 
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+//FileDeleteHandler: 删除文件以及元信息
+func FileDeleteHandler(w http.ResponseWriter,r *http.Request){
+	r.ParseForm()
+
+	fileSha1 := r.Form.Get("filehash")
+
+	fMeta := meta.GetFileMeta(fileSha1)
+	os.Remove(fMeta.Location)
+
+	meta.RemoveFileMeta(fileSha1)
+	w.WriteHeader(http.StatusOK)
 }

@@ -4,11 +4,16 @@
  * @Author: KongJHong
  * @Date: 2019-08-02 10:27:28
  * @LastEditors: KongJHong
- * @LastEditTime: 2019-08-02 10:40:21
+ * @LastEditTime: 2019-08-02 15:05:37
  */
 
 
 package meta
+
+import (
+	"sort"
+)
+
 
 //FileMeta: 文件元信息结构
 type FileMeta struct{
@@ -34,4 +39,20 @@ func UpdateFileMeta(fmeta FileMeta){
 //GetFileMeta: 通过sha1获取文件的元信息对象
 func GetFileMeta(fileSha1 string) FileMeta{
 	return fileMetas[fileSha1]
+}
+
+
+//GetLastFileMetas:获取批量的文件元信息列表
+func GetLastFileMetas(count int) []FileMeta{
+	fMetaArray := make([]FileMeta,len(fileMetas))
+	for _,v := range fileMetas{
+		fMetaArray = append(fMetaArray,v)
+	}
+	sort.Sort(ByUploadTime(fMetaArray)) //自定义fMetaArray排序
+	return fMetaArray[:count]
+}
+
+//RemoveFileMeta:删除元信息
+func RemoveFileMeta(fileSha1 string){
+	delete(fileMetas, fileSha1)
 }
