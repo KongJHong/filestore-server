@@ -4,7 +4,7 @@
  * @Author: KongJHong
  * @Date: 2019-08-02 09:39:03
  * @LastEditors: KongJHong
- * @LastEditTime: 2019-08-03 11:18:29
+ * @LastEditTime: 2019-08-03 19:09:13
  */
 
 package handler
@@ -22,13 +22,11 @@ import (
 	"strconv"
 )
 
-/*
- * UploadHandler： 处理文件上传
- * 1.获取上传页面
- * 2.选取本地文件,form形式上传文件
- * 3.云端接受文件流，写入本地存储
- * 4.云端更新文件元信息集合
- */
+//UploadHandler 处理文件上传
+// 1.获取上传页面
+// 2.选取本地文件,form形式上传文件
+// 3.云端接受文件流，写入本地存储
+// 4.云端更新文件元信息集合
 func UploadHandler(w http.ResponseWriter,r *http.Request){
 	if r.Method == "GET"{
 		//返回上传html页面
@@ -78,18 +76,19 @@ func UploadHandler(w http.ResponseWriter,r *http.Request){
 		fileMeta.FileSha1 = util.FileSha1(newFile)
 		
 		//meta.UpdateFileMeta(fileMeta)
-		meta.UpdateFileMetaDB(fileMeta)
+		_ = meta.UpdateFileMetaDB(fileMeta)
+		
 		http.Redirect(w, r, "/file/upload/suc", http.StatusFound)
 	}
 }
 
 
-//uploadSucHandler:上传已完成
+//UploadSucHandler 上传已完成
 func UploadSucHandler(w http.ResponseWriter, r *http.Request){
 	io.WriteString(w, "Upload finished")
 }
 
-//GetFileMetaHandler:查询文件元信息
+//GetFileMetaHandler 查询文件元信息
 func GetFileMetaHandler(w http.ResponseWriter, r *http.Request){
 	
 	r.ParseForm()//解析请求参数 如a=?&b=?这类，解析完成后放入Form字典等待取出
@@ -111,7 +110,7 @@ func GetFileMetaHandler(w http.ResponseWriter, r *http.Request){
 	w.Write(data)
 }
 
-//FileQueryHandler: 查询批量的文件元信息
+//FileQueryHandler 查询批量的文件元信息
 func FileQueryHandler(w http.ResponseWriter,r *http.Request){
 	
 	r.ParseForm()
@@ -127,7 +126,7 @@ func FileQueryHandler(w http.ResponseWriter,r *http.Request){
 	w.Write(data)
 }
 
-//DownloadHandler:实现文件下载接口
+//DownloadHandler 实现文件下载接口
 func DownloadHandler(w http.ResponseWriter, r *http.Request){
 	
 	r.ParseForm()
@@ -155,7 +154,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request){
 	w.Write(data)
 }
 
-//FileMetaUpdateHandler: 更新元信息接口（重命名） 
+//FileMetaUpdateHandler 更新元信息接口（重命名） 
 //客户端带3个参数 一：0表示重命名 1表示其他的一些更行操作
 //二：文件唯一标志：hash值
 //三：更新后的文件名
@@ -192,7 +191,7 @@ func FileMetaUpdateHandler(w http.ResponseWriter,r *http.Request){
 	w.Write(data)
 }
 
-//FileDeleteHandler: 删除文件以及元信息
+//FileDeleteHandler 删除文件以及元信息
 func FileDeleteHandler(w http.ResponseWriter,r *http.Request){
 	r.ParseForm()
 

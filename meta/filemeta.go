@@ -4,7 +4,7 @@
  * @Author: KongJHong
  * @Date: 2019-08-02 10:27:28
  * @LastEditors: KongJHong
- * @LastEditTime: 2019-08-03 11:17:19
+ * @LastEditTime: 2019-08-03 22:10:08
  */
 
 
@@ -16,7 +16,7 @@ import (
 )
 
 
-//FileMeta: 文件元信息结构
+//FileMeta 文件元信息结构
 type FileMeta struct{
 	FileSha1 string		//sha1 hash值
 	FileName string		//文件名
@@ -69,17 +69,23 @@ func GetFileMetaDB(fileSha1 string) (FileMeta,error){
 }
 
 
-//GetLastFileMetas:获取批量的文件元信息列表
+//GetLastFileMetas 获取批量的文件元信息列表
 func GetLastFileMetas(count int) []FileMeta{
+	if count > len(fileMetas){
+		count = len(fileMetas)
+	}
 	fMetaArray := make([]FileMeta,len(fileMetas))
+
+	i := 0
 	for _,v := range fileMetas{
-		fMetaArray = append(fMetaArray,v)
+		fMetaArray[i] = v
+		i++
 	}
 	sort.Sort(ByUploadTime(fMetaArray)) //自定义fMetaArray排序
 	return fMetaArray[:count]
 }
 
-//RemoveFileMeta:删除元信息
+//RemoveFileMeta 删除元信息
 func RemoveFileMeta(fileSha1 string){
 	delete(fileMetas, fileSha1)
 }

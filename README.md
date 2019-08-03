@@ -14,7 +14,8 @@
  |---db : 数据库相关函数
  |    |-- mysql
  |    |     |--conn.go : 管理mysql链接对象，返回数据库单例
- |    |-- file.go : 数据库API函数，调用conn.go的单例
+ |    |-- file.go : 处理文件的数据库API，调用conn.go的单例
+ |    |-- user.go : 处理用户事务的数据库API，调用conn.go单例
  |
  |
  |---doc : 一些重要文档资料
@@ -25,7 +26,7 @@
  |
  |---handler : 路由器映射API
  |    |-- handler.go : 路由器映射API，程序主逻辑
- |    |
+ |    |-- user.go    : 用户逻辑API
  |    |
  |
  |---meta : 文件元数据相关
@@ -39,6 +40,7 @@
  |
  |---util : 工具文件夹
  |    |-- util.go : 加密，路径合法化判断，文件大小的一些可共用的函数
+ |    |-- resp.go : 网页请求的reponse封装
  |
  |
 ```
@@ -93,3 +95,49 @@ http.HandleFunc("/file/delete", handler.FileDeleteHandler)
 2. 主从架构与文件表设计逻辑
 3. Golang与MySQL的亲密接触
 
+### 帐号系统的功能
+
+- 支持用户注册/登录
+- 支持用户Session鉴权
+- 用户数据资源隔离
+
+![](https://kongjhong-image.oss-cn-beijing.aliyuncs.com/img/{40AF06F9-629E-10FE-4EA8-85C8B4494F19}.jpg)
+
+**用户注册接口**
+```go
+//SignupHandler 处理用户注册请求
+func SignupHandler(w http.ResponseWriter,r *http.Request){
+    //1.http GET请求，直接返回注册页内容
+    //2.校验参数的有效性
+    //3.加密用户名密码
+    //4.存入数据库tbl_user表以及返回结果
+}
+```
+
+**用户登录接口**
+```go
+//SignInHandler 登录接口，没有设置路由，而是通过静态地址访问
+func SignInHandler(w http.ResponseWriter,r *http.Request){
+    //1.校验用户名及密码
+    //2.生成访问凭证(token)
+    //3.存储token到数据库tbl_user_token表
+    //4.返回username,token,重定向url等信息
+}
+```
+
+**用户信息查询接口**
+```go
+//UserInfoHandler 登录接口，没有设置路由，而是通过静态地址访问
+func UserInfoHandler(w http.ResponseWriter,r *http.Request){
+    //1.解析请求参数
+    //2.验证访问凭证(token)
+    //3.查询用户信息
+    //4.组装并且相应用户数据
+}
+```
+
+
+**本章小结**
+1. Mysql用户表的设计
+2. 注册/登录/查询接口的实现
+3. 验证Token的拦截器-
