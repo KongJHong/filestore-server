@@ -4,7 +4,7 @@
  * @Author: KongJHong
  * @Date: 2019-08-02 09:39:03
  * @LastEditors: KongJHong
- * @LastEditTime: 2019-08-02 20:22:25
+ * @LastEditTime: 2019-08-03 11:18:29
  */
 
 package handler
@@ -95,7 +95,13 @@ func GetFileMetaHandler(w http.ResponseWriter, r *http.Request){
 	r.ParseForm()//解析请求参数 如a=?&b=?这类，解析完成后放入Form字典等待取出
 
 	filehash := r.Form["filehash"][0]
-	fMeta := meta.GetFileMeta(filehash)
+//	fMeta := meta.GetFileMeta(filehash)
+	fMeta,err := meta.GetFileMetaDB(filehash)
+	if err != nil{
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	data,err := json.Marshal(fMeta)
 	if err != nil{
 		w.WriteHeader(http.StatusInternalServerError)

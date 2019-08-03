@@ -4,7 +4,7 @@
  * @Author: KongJHong
  * @Date: 2019-08-02 19:40:28
  * @LastEditors: KongJHong
- * @LastEditTime: 2019-08-02 20:04:16
+ * @LastEditTime: 2019-08-03 10:52:11
  */
 package mysql
 
@@ -19,7 +19,7 @@ import (
 var db *sql.DB
 
 func init(){
-	db,_ = sql.Open("mysql","root:root@tcp(127.0.0.1:3306)/fileserver?charset=utf8")
+	db,_ = sql.Open("mysql","root:123456@tcp(172.17.0.2:3306)/fileserver?charset=utf8")
 	db.SetMaxOpenConns(1000)	//设置最大同时活跃数
 	err := db.Ping()			//进行链接测试
 	if err != nil{
@@ -27,8 +27,6 @@ func init(){
 		os.Exit(1)
 	}
 }
-
-
 
 //DBConn: 返回数据库链接对象
 func DBConn() *sql.DB{
